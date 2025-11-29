@@ -1,9 +1,8 @@
 # vsc_PublishAutoUpdateVersion
 
 #### 介绍
-VSCode 插件：发布自动更新版本号
 
-这是一个 VSCode 扩展，可以帮助您自动更新项目中的版本号。支持多个文件、自定义正则表达式，以及多种版本号更新方式（Patch、Minor、Major、自定义）。
+VSCode 插件：发布自动更新版本号
 
 #### 功能特性
 
@@ -59,6 +58,7 @@ VSCode 插件：发布自动更新版本号
 ```
 
 **配置说明：**
+
 - `path`: 文件路径（相对于项目根目录）
 - `versionRegex`: 用于匹配版本号的正则表达式（建议使用捕获组 `([\\d.]+)` 来捕获版本号）
 - `description`: 文件描述（可选，用于在界面中显示）
@@ -66,14 +66,17 @@ VSCode 插件：发布自动更新版本号
 ##### 2. 使用插件
 
 **方法一：使用快捷键（推荐）**
+
 - 按 `Ctrl+Shift+V`（Mac: `Cmd+Shift+V`）快速打开版本更新界面
 
 **方法二：使用命令面板**
+
 1. 在 VSCode 中打开包含 `.versionconfig` 的项目
 2. 按 `Ctrl+Shift+P`（Mac: `Cmd+Shift+P`）打开命令面板
 3. 输入 "更新版本号" 并选择该命令
 
 **操作流程：**
+
 1. 如果工作区中有多个项目，选择要更新的项目
 2. 选择要更新版本号的文件（可多选，默认全选）
 3. 选择版本更新方式：
@@ -84,27 +87,32 @@ VSCode 插件：发布自动更新版本号
 4. 确认更新
 
 **状态栏显示：**
+
 - 当编辑器激活文件时，右下角状态栏会显示当前项目的版本号（格式：`v1.2.3`）
 - 点击状态栏可以快速打开版本更新界面
 - 如果没有激活文件或找不到版本号，状态栏会自动隐藏
 
 **使用场景：**
+
 - 在打包前，先使用插件更新版本号
 - 然后在控制台运行 `npm run build:xxx` 进行打包
 
 ##### 3. 正则表达式示例
 
 **package.json:**
+
 ```regex
 "version"\s*:\s*"([\d.]+)"
 ```
 
 **README.md 版本徽章:**
+
 ```regex
 !\[Version\]\(https://img\.shields\.io/badge/version-([\d.]+)-blue\.svg\)
 ```
 
 **.csproj 文件:**
+
 ```regex
 <Version>([\d.]+)</Version>
 ```
@@ -135,6 +143,7 @@ npm run watch
 5. 在原始窗口中设置断点进行调试
 
 **调试配置说明：**
+
 - `.vscode/launch.json` 中配置了"运行扩展"调试配置
 - 支持断点调试、变量查看等功能
 
@@ -143,11 +152,13 @@ npm run watch
 ##### 3. 打包扩展
 
 **方法一：使用任务**
+
 1. 按 `Ctrl+Shift+P`（Mac: `Cmd+Shift+P`）打开命令面板
 2. 输入 "Tasks: Run Task"
 3. 选择 "编译并打包" 或 "打包扩展"
 
 **方法二：使用命令行**
+
 ```bash
 # 编译并打包
 npm run package
@@ -157,6 +168,7 @@ npx vsce package
 ```
 
 打包完成后会在项目根目录生成 `.vsix` 文件，可以通过以下方式安装：
+
 - 在 VSCode 中按 `Ctrl+Shift+P`，选择 "Extensions: Install from VSIX..."
 - 或使用命令行：`code --install-extension publish-auto-update-version-0.0.1.vsix`
 
@@ -171,10 +183,9 @@ npx vsce package
 3.  提交代码
 4.  新建 Pull Request
 
-
 #### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
+1.  使用 Readme_XXX.md 来支持不同的语言，例如 Readme_en.md, Readme_zh.md
 2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
 3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
 4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
