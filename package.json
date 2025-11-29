@@ -1,11 +1,22 @@
 {
   "name": "odinsam-vstools",
-  "displayName": "发布自动更新版本号",
-  "description": "自动更新项目中的版本号，支持多个文件和自定义正则表达式",
+  "displayName": "vscode扩展工具",
+  "description": "一个强大的 VS Code 扩展，用于自动管理和更新项目中的版本号，支持多文件配置、可视化操作，并提供丰富的开发工具。",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.74.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/odinsam/vse-vs-tools.git"
+  },
+  "publisher": "odinsam",
+  "keywords": [
+    "debug"
+  ],
+  "author": "odinsam",
+  "license": "ISC",
+  "icon": "assets/avatar.png",
   "categories": [
     "Other"
   ],
