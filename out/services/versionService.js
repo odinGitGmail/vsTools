@@ -35,10 +35,26 @@ var __importStar = (this && this.__importStar) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VersionService = void 0;
 const child_process_1 = require("child_process");
-const util = __importStar(require("util"));
 const path = __importStar(require("path"));
 const fs = __importStar(require("fs"));
-const execPromise = util.promisify(child_process_1.exec);
+/**
+ * 执行命令并返回 Promise
+ * @param command 要执行的命令
+ * @param options 执行选项
+ * @returns Promise，resolve 时返回 stdout 字符串
+ */
+function execPromise(command, options) {
+    return new Promise((resolve, reject) => {
+        (0, child_process_1.exec)(command, { ...options, encoding: 'utf8' }, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+            }
+            else {
+                resolve(String(stdout || ''));
+            }
+        });
+    });
+}
 /**
  * 版本号服务类
  */
@@ -50,7 +66,7 @@ class VersionService {
      */
     static async getLatestTag(projectRoot) {
         try {
-            const { stdout } = await execPromise('git describe --tags --abbrev=0', {
+            const stdout = await execPromise('git describe --tags --abbrev=0', {
                 cwd: projectRoot,
                 maxBuffer: 1024 * 1024
             });
@@ -69,7 +85,7 @@ class VersionService {
     static async getCurrentVersion(projectRoot) {
         try {
             // 尝试获取当前提交的 tag
-            const { stdout: tagOutput } = await execPromise('git describe --tags --exact-match HEAD 2>/dev/null || echo ""', {
+            const tagOutput = await execPromise('git describe --tags --exact-match HEAD 2>/dev/null || echo ""', {
                 cwd: projectRoot,
                 maxBuffer: 1024 * 1024,
                 shell: true
@@ -78,7 +94,7 @@ class VersionService {
                 return tagOutput.trim();
             }
             // 如果没有 tag，获取提交哈希（前8位）
-            const { stdout: hashOutput } = await execPromise('git rev-parse --short=8 HEAD', {
+            const hashOutput = await execPromise('git rev-parse --short=8 HEAD', {
                 cwd: projectRoot,
                 maxBuffer: 1024 * 1024
             });

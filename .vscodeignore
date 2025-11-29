@@ -1,0 +1,27 @@
+# 源代码文件（只需要编译后的文件）
+src/**
+!src/template/**
+*.ts
+!*.d.ts
+
+# 开发文档（中文文件名可能导致编码问题）
+文件结构.md
+测试指南.md
+状态栏问题排查.md
+
+# 测试和开发脚本
+test-project-setup.sh
+.gitignore
+.gitcommit
+
+# 开发配置文件
+.vscode/**
+tsconfig.json
+
+# 依赖和构建产物
+node_modules/**
+*.vsix
+
+# 其他不需要的文件
+.DS_Store
+*.log

@@ -20,8 +20,26 @@ export class TemplateService {
         if (extension) {
             // 模板文件在扩展根目录的src/template
             const templatePath = path.join(extension.extensionPath, 'src', 'template');
+            console.log(`[模板服务] 尝试从扩展路径获取模板: ${templatePath}`);
             if (fs.existsSync(templatePath)) {
+                console.log(`[模板服务] ✅ 找到模板目录: ${templatePath}`);
                 return templatePath;
+            }
+            
+            // 如果 src/template 不存在，尝试从扩展根目录直接查找
+            const rootTemplatePath = path.join(extension.extensionPath, 'template');
+            console.log(`[模板服务] 尝试从扩展根目录获取模板: ${rootTemplatePath}`);
+            if (fs.existsSync(rootTemplatePath)) {
+                console.log(`[模板服务] ✅ 找到模板目录: ${rootTemplatePath}`);
+                return rootTemplatePath;
+            }
+            
+            // 列出扩展目录下的所有文件和目录，用于调试
+            try {
+                const extensionFiles = fs.readdirSync(extension.extensionPath);
+                console.log(`[模板服务] 扩展目录内容: ${extensionFiles.join(', ')}`);
+            } catch (error) {
+                console.error(`[模板服务] 无法读取扩展目录: ${error}`);
             }
         }
         
@@ -32,16 +50,21 @@ export class TemplateService {
             // 编译后的代码：从out/services/..找到项目根目录，然后到src/template
             const projectRoot = path.resolve(__dirname, '..', '..');
             templatePath = path.join(projectRoot, 'src', 'template');
+            console.log(`[模板服务] 从编译后路径推断: ${templatePath}`);
         } else {
             // 开发环境：直接从__dirname向上找到src/template
             templatePath = path.join(__dirname, '..', 'template');
+            console.log(`[模板服务] 从开发环境路径推断: ${templatePath}`);
         }
         
         if (fs.existsSync(templatePath)) {
+            console.log(`[模板服务] ✅ 找到模板目录: ${templatePath}`);
             return templatePath;
         }
         
         // 如果都找不到，返回路径（让错误在读取文件时抛出，提供更详细的错误信息）
+        console.error(`[模板服务] ❌ 未找到模板目录: ${templatePath}`);
+        console.error(`[模板服务] 扩展路径: ${extension?.extensionPath || '未找到扩展'}`);
         return templatePath;
     }
 

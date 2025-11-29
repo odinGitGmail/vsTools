@@ -2,12 +2,27 @@
  * 版本号服务
  */
 import * as vscode from 'vscode';
-import { exec } from 'child_process';
-import * as util from 'util';
+import { exec, ExecOptions } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs';
 
-const execPromise = util.promisify(exec);
+/**
+ * 执行命令并返回 Promise
+ * @param command 要执行的命令
+ * @param options 执行选项
+ * @returns Promise，resolve 时返回 stdout 字符串
+ */
+function execPromise(command: string, options?: any): Promise<string> {
+    return new Promise((resolve, reject) => {
+        exec(command, { ...options, encoding: 'utf8' }, (error, stdout, stderr) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(String(stdout || ''));
+            }
+        });
+    });
+}
 
 /**
  * 版本号服务类
@@ -20,7 +35,7 @@ export class VersionService {
      */
     public static async getLatestTag(projectRoot: string): Promise<string | null> {
         try {
-            const { stdout } = await execPromise(
+            const stdout = await execPromise(
                 'git describe --tags --abbrev=0',
                 {
                     cwd: projectRoot,
@@ -42,7 +57,7 @@ export class VersionService {
     public static async getCurrentVersion(projectRoot: string): Promise<string> {
         try {
             // 尝试获取当前提交的 tag
-            const { stdout: tagOutput } = await execPromise(
+            const tagOutput = await execPromise(
                 'git describe --tags --exact-match HEAD 2>/dev/null || echo ""',
                 {
                     cwd: projectRoot,
@@ -56,7 +71,7 @@ export class VersionService {
             }
 
             // 如果没有 tag，获取提交哈希（前8位）
-            const { stdout: hashOutput } = await execPromise(
+            const hashOutput = await execPromise(
                 'git rev-parse --short=8 HEAD',
                 {
                     cwd: projectRoot,

@@ -2,7 +2,7 @@
   "name": "odinsam-vstools",
   "displayName": "vscode扩展工具",
   "description": "一个强大的 VS Code 扩展，用于自动管理和更新项目中的版本号，支持多文件配置、可视化操作，并提供丰富的开发工具。",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -138,7 +138,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package",
+    "package": "vsce package --baseContentUrl https://gitee.com/odinsam/vse-vs-tools --baseImagesUrl https://gitee.com/odinsam/vse-vs-tools",
     "prepackage": "npm run compile"
   },
   "devDependencies": {
