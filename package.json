@@ -1,0 +1,140 @@
+{
+  "name": "odinsam-vstools",
+  "displayName": "发布自动更新版本号",
+  "description": "自动更新项目中的版本号，支持多个文件和自定义正则表达式",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "odinsamVsTools.updateVersion",
+        "title": "Update Version",
+        "category": "Version"
+      },
+      {
+        "command": "odinsamVsTools.createGitignore",
+        "title": "创建.gitignore文件",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.createLicense",
+        "title": "创建LICENSE文件",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.createVersionConfig",
+        "title": "创建.versionconfig文件",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.createChangelog",
+        "title": "创建CHANGELOG.md文件",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.updateVersionFromFile",
+        "title": "更新版本号",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.updateChangelog",
+        "title": "更新日志",
+        "category": "小工具"
+      }
+    ],
+    "submenus": [
+      {
+        "id": "odinsamVsTools.folderMenu",
+        "label": "小工具"
+      },
+      {
+        "id": "odinsamVsTools.fileMenu",
+        "label": "小工具"
+      },
+      {
+        "id": "odinsamVsTools.changelogMenu",
+        "label": "小工具"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "submenu": "odinsamVsTools.folderMenu",
+          "when": "explorerResourceIsFolder",
+          "group": "9_tools"
+        },
+        {
+          "submenu": "odinsamVsTools.fileMenu",
+          "when": "resourceFilename == '.versionconfig'",
+          "group": "9_tools"
+        },
+        {
+          "submenu": "odinsamVsTools.changelogMenu",
+          "when": "resourceFilename == 'CHANGELOG.md'",
+          "group": "9_tools"
+        }
+      ],
+      "odinsamVsTools.folderMenu": [
+        {
+          "command": "odinsamVsTools.createGitignore",
+          "group": "1_create"
+        },
+        {
+          "command": "odinsamVsTools.createLicense",
+          "group": "1_create"
+        },
+        {
+          "command": "odinsamVsTools.createVersionConfig",
+          "group": "1_create"
+        },
+        {
+          "command": "odinsamVsTools.createChangelog",
+          "group": "1_create"
+        }
+      ],
+      "odinsamVsTools.fileMenu": [
+        {
+          "command": "odinsamVsTools.updateVersionFromFile",
+          "group": "1_update"
+        }
+      ],
+      "odinsamVsTools.changelogMenu": [
+        {
+          "command": "odinsamVsTools.updateChangelog",
+          "group": "1_update"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "odinsamVsTools.updateVersion",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorTextFocus"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package",
+    "prepackage": "npm run compile"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/vscode": "^1.74.0",
+    "@vscode/vsce": "^2.22.0",
+    "typescript": "^5.0.0"
+  }
+}
+

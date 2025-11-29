@@ -1,0 +1,138 @@
+/**
+ * 版本号服务
+ */
+import * as vscode from 'vscode';
+import { exec } from 'child_process';
+import * as util from 'util';
+import * as path from 'path';
+import * as fs from 'fs';
+
+const execPromise = util.promisify(exec);
+
+/**
+ * 版本号服务类
+ */
+export class VersionService {
+    /**
+     * 获取最新的 tag 版本号
+     * @param projectRoot 项目根目录
+     * @returns 最新的 tag 版本号，如果没有则返回 null
+     */
+    public static async getLatestTag(projectRoot: string): Promise<string | null> {
+        try {
+            const { stdout } = await execPromise(
+                'git describe --tags --abbrev=0',
+                {
+                    cwd: projectRoot,
+                    maxBuffer: 1024 * 1024
+                }
+            );
+            return stdout.trim() || null;
+        } catch (error) {
+            // 如果没有 tag，命令会失败，返回 null
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前提交的版本号（tag 或提交哈希）
+     * @param projectRoot 项目根目录
+     * @returns 版本号
+     */
+    public static async getCurrentVersion(projectRoot: string): Promise<string> {
+        try {
+            // 尝试获取当前提交的 tag
+            const { stdout: tagOutput } = await execPromise(
+                'git describe --tags --exact-match HEAD 2>/dev/null || echo ""',
+                {
+                    cwd: projectRoot,
+                    maxBuffer: 1024 * 1024,
+                    shell: true
+                }
+            );
+            
+            if (tagOutput.trim()) {
+                return tagOutput.trim();
+            }
+
+            // 如果没有 tag，获取提交哈希（前8位）
+            const { stdout: hashOutput } = await execPromise(
+                'git rev-parse --short=8 HEAD',
+                {
+                    cwd: projectRoot,
+                    maxBuffer: 1024 * 1024
+                }
+            );
+            
+            return hashOutput.trim();
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new Error(`获取当前版本号失败: ${errorMessage}`);
+        }
+    }
+
+    /**
+     * 获取项目文件中的版本号（如 package.json、.csproj 等）
+     * @param projectRoot 项目根目录
+     * @param filePath 文件路径（相对于项目根目录）
+     * @param versionRegex 版本号正则表达式
+     * @returns 版本号，如果未找到则返回 null
+     */
+    public static async getProjectVersion(
+        projectRoot: string,
+        filePath: string,
+        versionRegex: string
+    ): Promise<string | null> {
+        try {
+            const fullPath = path.join(projectRoot, filePath);
+            if (!fs.existsSync(fullPath)) {
+                return null;
+            }
+
+            const content = fs.readFileSync(fullPath, 'utf8');
+            const match = content.match(new RegExp(versionRegex));
+            
+            if (match && match[1]) {
+                return match[1];
+            }
+            
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    /**
+     * 自动生成提交信息（包含版本号）
+     * @param projectRoot 项目根目录
+     * @param baseMessage 基础提交信息
+     * @returns 包含版本号的提交信息
+     */
+    public static async generateCommitMessage(
+        projectRoot: string,
+        baseMessage: string
+    ): Promise<string> {
+        try {
+            // 获取当前版本号
+            const currentVersion = await this.getCurrentVersion(projectRoot);
+            
+            // 获取最新的 tag
+            const latestTag = await this.getLatestTag(projectRoot);
+            
+            // 生成提交信息
+            let commitMessage = baseMessage;
+            
+            if (latestTag) {
+                commitMessage += `\n\n版本: ${currentVersion} (基于 ${latestTag})`;
+            } else {
+                commitMessage += `\n\n版本: ${currentVersion}`;
+            }
+            
+            return commitMessage;
+        } catch (error) {
+            // 如果获取版本号失败，返回原始提交信息
+            return baseMessage;
+        }
+    }
+}
+

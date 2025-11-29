@@ -1,7 +1,7 @@
-# vsTools
+# vsc_PublishAutoUpdateVersion
 
 #### Description
-vscode插件：一些小工具
+vscode插件：发布自动更新版本号
 
 #### Software Architecture
 Software architecture description
