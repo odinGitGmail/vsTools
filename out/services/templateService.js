@@ -123,11 +123,46 @@ class TemplateService {
         }
     }
     /**
+     * 获取所有可用的 LICENSE 模板文件列表
+     * @returns LICENSE 模板文件名列表
+     */
+    static getLicenseTemplates() {
+        try {
+            const licenseDir = path.join(this.getTemplateDir(), 'license');
+            if (!fs.existsSync(licenseDir)) {
+                console.log(`[模板服务] LICENSE 模板目录不存在: ${licenseDir}`);
+                return [];
+            }
+            const files = fs.readdirSync(licenseDir);
+            // 过滤出文件（排除目录）
+            const licenseFiles = files.filter(file => {
+                const filePath = path.join(licenseDir, file);
+                return fs.statSync(filePath).isFile();
+            });
+            console.log(`[模板服务] 找到 ${licenseFiles.length} 个 LICENSE 模板: ${licenseFiles.join(', ')}`);
+            return licenseFiles;
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error(`[模板服务] 获取 LICENSE 模板列表失败: ${errorMessage}`);
+            return [];
+        }
+    }
+    /**
      * 创建 LICENSE 文件
      * @param targetDir 目标目录
+     * @param templateFileName LICENSE 模板文件名（位于 license/ 目录下），如果不提供则使用默认的 LICENSE
      */
-    static async createLicense(targetDir) {
-        const templatePath = path.join(this.getTemplateDir(), 'LICENSE');
+    static async createLicense(targetDir, templateFileName) {
+        let templatePath;
+        if (templateFileName) {
+            // 使用指定的模板文件（位于 license/ 目录下）
+            templatePath = path.join(this.getTemplateDir(), 'license', templateFileName);
+        }
+        else {
+            // 使用默认的 LICENSE 文件（向后兼容）
+            templatePath = path.join(this.getTemplateDir(), 'LICENSE');
+        }
         const targetPath = path.join(targetDir, 'LICENSE');
         if (fs.existsSync(targetPath)) {
             const result = await vscode.window.showWarningMessage('LICENSE 文件已存在，是否覆盖？', { modal: true }, '覆盖', '取消');
@@ -136,9 +171,13 @@ class TemplateService {
             }
         }
         try {
+            if (!fs.existsSync(templatePath)) {
+                throw new Error(`LICENSE 模板文件不存在: ${templatePath}`);
+            }
             const content = fs.readFileSync(templatePath, 'utf8');
             fs.writeFileSync(targetPath, content, 'utf8');
-            vscode.window.showInformationMessage(`已创建 LICENSE 文件: ${targetPath}`);
+            const templateName = templateFileName || '默认';
+            vscode.window.showInformationMessage(`已创建 LICENSE 文件: ${targetPath} (模板: ${templateName})`);
         }
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);

@@ -1,5 +1,11 @@
 # 发布自动更新版本号
 
+![Version](https://img.shields.io/badge/version-1.0.3-blue.svg)
+![VS Code](https://img.shields.io/badge/VS%20Code-%5E1.74.0-blue.svg)
+![License](https://img.shields.io/badge/license-Unlicense-green.svg)
+![Gitee](https://img.shields.io/badge/Gitee-odinsam%2Fvse--vs--tools-red.svg)
+[![Author](https://img.shields.io/badge/author-odinsam-orange.svg)](https://www.odinsam.com)
+
 一个强大的 VS Code 扩展，用于自动管理和更新项目中的版本号，支持多文件配置、可视化操作，并提供丰富的开发工具。
 
 ## 📋 目录
@@ -75,22 +81,26 @@ src/
 ### 方式一：从源码安装
 
 1. 克隆或下载本项目
+
    ```bash
-   git clone <repository-url>
-   cd vse_vsTools
+   git clone https://gitee.com/odinsam/vse-vs-tools.git
+   cd vse-vs-tools
    ```
 
 2. 安装依赖
+
    ```bash
    npm install
    ```
 
 3. 编译项目
+
    ```bash
    npm run compile
    ```
 
 4. 打包扩展（可选）
+
    ```bash
    npm run package
    ```
@@ -114,8 +124,9 @@ src/
 在项目根目录下创建 `.versionconfig` 配置文件。你可以通过以下方式创建：
 
 **方式一：使用扩展命令（推荐）**
+
 1. 在文件资源管理器中右键点击项目根目录
-2. 选择"小工具" → "创建.versionconfig文件"
+2. 选择"小工具" → "创建.versionconfig 文件"
 3. 扩展会自动创建配置文件模板
 
 **方式二：手动创建**
@@ -169,21 +180,25 @@ src/
 #### 操作流程
 
 1. **选择项目**（如果工作区中有多个项目）
+
    - 扩展会自动检测工作区中所有包含 `.versionconfig` 的项目
    - 如果有多个项目，会显示项目列表供你选择
 
 2. **选择要更新的文件**（可多选，默认全选）
+
    - 扩展会列出配置文件中所有文件
    - 显示每个文件的当前版本号
    - 可以选择部分文件进行更新
 
 3. **选择版本更新方式**
+
    - **Patch（补丁版本）**: 例如 `0.0.3` → `0.0.4`（修复 bug）
    - **Minor（次版本）**: 例如 `0.0.3` → `0.1.0`（新功能，向后兼容）
    - **Major（主版本）**: 例如 `0.0.3` → `1.0.0`（重大变更，可能不兼容）
    - **自定义版本号**: 手动输入版本号（如 `2.0.0-beta.1`）
 
 4. **确认更新**
+
    - 显示预览信息（当前版本 → 新版本）
    - 确认后执行更新操作
 
@@ -200,6 +215,7 @@ src/
 - **智能隐藏**: 如果找不到项目或版本号，状态栏会显示默认文本
 
 **使用场景：**
+
 - 快速查看当前项目版本号
 - 在编辑不同文件时，了解当前项目的版本信息
 
@@ -212,26 +228,46 @@ src/
 快速创建 `.gitignore` 文件，包含常见项目的忽略规则。
 
 **使用方法：**
+
 1. 右键点击项目根目录
-2. 选择"小工具" → "创建.gitignore文件"
+2. 选择"小工具" → "创建.gitignore 文件"
 3. 如果文件已存在，会提示是否覆盖
 
 #### 4.2 创建 LICENSE 文件
 
-快速创建 MIT License 文件。
+快速创建 LICENSE 文件，支持多种许可证模板。
 
 **使用方法：**
+
 1. 右键点击项目根目录
-2. 选择"小工具" → "创建LICENSE文件"
-3. 如果文件已存在，会提示是否覆盖
+2. 选择"小工具" → "创建 LICENSE 文件"
+3. 选择具体的许可证模板（如 `MitLicense`、`UnLicense` 等）
+4. 扩展会在项目根目录创建 `LICENSE` 文件（固定文件名，无扩展名）
+5. 如果文件已存在，会提示是否覆盖
+
+**支持的许可证模板：**
+
+- 扩展会自动检测 `src/template/license/` 目录下的所有模板文件
+- 子菜单数量取决于该目录下的文件数量
+- 子菜单名称对应模板文件名
+- 当前支持的模板：
+  - `MitLicense` - MIT 许可证
+  - `UnLicense` - Unlicense 许可证
+
+**添加自定义许可证模板：**
+
+1. 将许可证模板文件放到 `src/template/license/` 目录
+2. 在 `package.json` 中添加对应的命令和菜单配置
+3. 重新编译和打包扩展
 
 #### 4.3 创建 .versionconfig 文件
 
 快速创建版本配置文件。
 
 **使用方法：**
+
 1. 右键点击项目根目录
-2. 选择"小工具" → "创建.versionconfig文件"
+2. 选择"小工具" → "创建.versionconfig 文件"
 3. 扩展会创建包含常用配置的模板文件
 
 #### 4.4 创建 CHANGELOG.md 文件
@@ -239,8 +275,9 @@ src/
 快速创建更新日志文件。
 
 **使用方法：**
+
 1. 右键点击项目根目录
-2. 选择"小工具" → "创建CHANGELOG.md文件"
+2. 选择"小工具" → "创建 CHANGELOG.md 文件"
 3. 如果项目是 Git 仓库，扩展会尝试从 Git 日志生成内容
 4. 如果项目不是 Git 仓库，会创建空模板
 
@@ -249,6 +286,7 @@ src/
 扩展可以基于 Git 提交记录自动生成 CHANGELOG.md 文件。
 
 **使用方法：**
+
 1. 在文件资源管理器中右键点击 `CHANGELOG.md` 文件
 2. 选择"小工具" → "更新日志"
 3. 扩展会：
@@ -262,28 +300,26 @@ src/
 ```markdown
 # 更新日志
 
-
 v1.0.0
-
 
 日期: 2024-01-01
 
 提交说明:
 
-
     初始版本发布
-
-
 
 作者: John Doe
 ```
 
 **特性：**
-- 自动提取版本号（从 Git Tag）
+
+- **Tag 优先级最高** - 自动提取版本号，优先使用 Git Tag
+  - 优先级顺序：Git Tag（最高） → 提交哈希 → 分支名
+  - 使用多种方法确保能获取到 Tag：`git tag --contains`、`git describe --exact-match`、`git describe --tags`
 - 按日期分组
 - 显示完整的提交说明
 - 包含作者信息
-- 如果没有 Tag，使用提交哈希作为版本号
+- 如果没有 Tag，使用提交哈希（前 8 位）作为版本号
 
 ## ⚙️ 配置说明
 
@@ -307,11 +343,11 @@ v1.0.0
 
 ### 字段说明
 
-| 字段 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| `path` | string | 是 | 文件路径，相对于项目根目录 |
-| `versionRegex` | string | 是 | 用于匹配版本号的正则表达式，建议包含捕获组 `([\\d.]+)` |
-| `description` | string | 否 | 文件描述，用于在界面中显示，便于识别 |
+| 字段           | 类型   | 必填 | 说明                                                   |
+| -------------- | ------ | ---- | ------------------------------------------------------ |
+| `path`         | string | 是   | 文件路径，相对于项目根目录                             |
+| `versionRegex` | string | 是   | 用于匹配版本号的正则表达式，建议包含捕获组 `([\\d.]+)` |
+| `description`  | string | 否   | 文件描述，用于在界面中显示，便于识别                   |
 
 ### 路径规则
 
@@ -331,6 +367,7 @@ v1.0.0
 ### package.json
 
 **文件内容：**
+
 ```json
 {
   "name": "my-project",
@@ -339,11 +376,13 @@ v1.0.0
 ```
 
 **正则表达式：**
+
 ```regex
 "version"\s*:\s*"([\d.]+)"
 ```
 
 **配置示例：**
+
 ```json
 {
   "path": "package.json",
@@ -355,16 +394,19 @@ v1.0.0
 ### README.md 版本徽章
 
 **文件内容：**
+
 ```markdown
 ![Version](https://img.shields.io/badge/version-1.2.3-blue.svg)
 ```
 
 **正则表达式：**
+
 ```regex
 !\[Version\]\(https://img\.shields\.io/badge/version-([\d.]+)-blue\.svg\)
 ```
 
 **配置示例：**
+
 ```json
 {
   "path": "README.md",
@@ -376,6 +418,7 @@ v1.0.0
 ### .NET .csproj 文件
 
 **文件内容：**
+
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
@@ -385,11 +428,13 @@ v1.0.0
 ```
 
 **正则表达式：**
+
 ```regex
 <Version>([\d.]+)</Version>
 ```
 
 **配置示例：**
+
 ```json
 {
   "path": "src/MyProject.csproj",
@@ -401,6 +446,7 @@ v1.0.0
 ### Python setup.py
 
 **文件内容：**
+
 ```python
 setup(
     name="my-project",
@@ -409,11 +455,13 @@ setup(
 ```
 
 **正则表达式：**
+
 ```regex
 version\s*=\s*["']([\d.]+)["']
 ```
 
 **配置示例：**
+
 ```json
 {
   "path": "setup.py",
@@ -446,10 +494,11 @@ npm run watch
 5. 在原始窗口中设置断点进行调试
 
 **调试配置说明：**
+
 - `.vscode/launch.json` 中配置了"运行扩展"调试配置
 - 支持断点调试、变量查看等功能
 
-**详细测试步骤请参考**: [测试指南.md](./测试指南.md)
+**详细测试步骤请参考**: [测试指南.md](https://gitee.com/odinsam/vse-vs-tools/blob/master/测试指南.md)
 
 ### 打包扩展
 
@@ -476,7 +525,7 @@ npx vsce package
 
 ## 📁 项目结构
 
-详细的项目结构说明请参考 [文件结构.md](./文件结构.md)
+详细的项目结构说明请参考 [文件结构.md](https://gitee.com/odinsam/vse-vs-tools/blob/master/文件结构.md)
 
 ```
 vse_vsTools/
@@ -495,8 +544,11 @@ vse_vsTools/
 │   │   ├── gitService.ts            # Git 服务
 │   │   └── versionService.ts        # 版本服务
 │   ├── template/                 # 模板文件目录
-│   │   ├── CHANGELOG.md
-│   │   └── LICENSE
+│   │   ├── CHANGELOG.md          # CHANGELOG 模板
+│   │   ├── LICENSE               # 默认 LICENSE 模板（向后兼容）
+│   │   └── license/              # LICENSE 模板目录
+│   │       ├── MitLicense        # MIT 许可证模板
+│   │       └── UnLicense         # Unlicense 许可证模板
 │   └── extension.ts             # 扩展主入口
 ├── out/                          # 编译输出目录（自动生成）
 ├── node_modules/                 # 依赖包（自动生成）
@@ -527,18 +579,18 @@ vse_vsTools/
 
 ## 📄 许可证
 
-本项目采用 MIT 许可证，详情请参阅 [LICENSE](./LICENSE) 文件。
+本项目采用 Unlicense 许可证，详情请参阅 [LICENSE](https://gitee.com/odinsam/vse-vs-tools/blob/master/LICENSE) 文件。
 
 ## 📞 支持与反馈
 
 如果你遇到问题或有任何建议，请：
 
-1. 查看 [测试指南.md](./测试指南.md) 和 [状态栏问题排查.md](./状态栏问题排查.md)
+1. 查看 [测试指南.md](https://gitee.com/odinsam/vse-vs-tools/blob/master/测试指南.md) 和 [状态栏问题排查.md](https://gitee.com/odinsam/vse-vs-tools/blob/master/状态栏问题排查.md)
 2. 在 Issues 中报告问题
 3. 提交 Pull Request 贡献代码
 
 ---
 
 **开发团队**: odinsam  
-**项目名称**: 发布自动更新版本号  
-**版本**: 0.0.1
+**项目名称**: vscode 扩展工具  
+**版本**: 1.0.1

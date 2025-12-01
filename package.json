@@ -2,7 +2,7 @@
   "name": "odinsam-vstools",
   "displayName": "vscode扩展工具",
   "description": "一个强大的 VS Code 扩展，用于自动管理和更新项目中的版本号，支持多文件配置、可视化操作，并提供丰富的开发工具。",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "engines": {
     "vscode": "^1.74.0"
   },
@@ -10,6 +10,10 @@
     "type": "git",
     "url": "https://gitee.com/odinsam/vse-vs-tools.git"
   },
+  "bugs": {
+    "url": "https://gitee.com/odinsam/vse-vs-tools/issues"
+  },
+  "homepage": "https://gitee.com/odinsam/vse-vs-tools#readme",
   "publisher": "odinsam",
   "keywords": [
     "debug"
@@ -39,6 +43,16 @@
       {
         "command": "odinsamVsTools.createLicense",
         "title": "创建LICENSE文件",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.createLicense.MitLicense",
+        "title": "MitLicense",
+        "category": "小工具"
+      },
+      {
+        "command": "odinsamVsTools.createLicense.UnLicense",
+        "title": "UnLicense",
         "category": "小工具"
       },
       {
@@ -74,6 +88,10 @@
       {
         "id": "odinsamVsTools.changelogMenu",
         "label": "小工具"
+      },
+      {
+        "id": "odinsamVsTools.licenseMenu",
+        "label": "创建LICENSE文件"
       }
     ],
     "menus": {
@@ -100,7 +118,7 @@
           "group": "1_create"
         },
         {
-          "command": "odinsamVsTools.createLicense",
+          "submenu": "odinsamVsTools.licenseMenu",
           "group": "1_create"
         },
         {
@@ -110,6 +128,16 @@
         {
           "command": "odinsamVsTools.createChangelog",
           "group": "1_create"
+        }
+      ],
+      "odinsamVsTools.licenseMenu": [
+        {
+          "command": "odinsamVsTools.createLicense.MitLicense",
+          "group": "1_license"
+        },
+        {
+          "command": "odinsamVsTools.createLicense.UnLicense",
+          "group": "1_license"
         }
       ],
       "odinsamVsTools.fileMenu": [
@@ -138,7 +166,7 @@
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "package": "vsce package --baseContentUrl https://gitee.com/odinsam/vse-vs-tools --baseImagesUrl https://gitee.com/odinsam/vse-vs-tools",
+    "package": "vsce package --baseContentUrl https://gitee.com/odinsam/vse-vs-tools --baseImagesUrl https://gitee.com/odinsam/vse-vs-tools --allow-missing-repository",
     "prepackage": "npm run compile"
   },
   "devDependencies": {
@@ -148,4 +176,3 @@
     "typescript": "^5.0.0"
   }
 }
-

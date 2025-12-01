@@ -197,21 +197,132 @@ export class GitService {
                 }
                 
                 // 提取版本号
-                // 优先级：1. tag 2. 提交哈希 3. -> 后面的分支名
+                // 优先级：1. tag（最高优先级） 2. 提交哈希 3. -> 后面的分支名
                 let versionTag = '无';
-                if (versionLine) {
+                
+                // 1. 优先使用 git 命令获取 tag（最高优先级，最可靠的方法）
+                // 只有当有commitHash时才执行git命令
+                if (commitHash) {
+                    console.log(`[Git服务] 开始为提交 ${commitHash} 查找 tag...`);
+                    try {
+                        // 方法1: 优先尝试使用 git tag --contains 查找包含该提交的tag（最准确）
+                        // 这会返回所有包含该提交的tag，我们取最新的
+                        try {
+                            console.log(`[Git服务] 尝试方法1: git tag --contains ${commitHash}`);
+                            const { stdout: containsOutput, stderr: containsStderr } = await execPromise(
+                                `git tag --contains ${commitHash} --sort=-version:refname`,
+                                {
+                                    cwd: projectRoot,
+                                    maxBuffer: 1024 * 1024 // 1MB buffer
+                                }
+                            );
+                            if (containsStderr) {
+                                console.log(`[Git服务] git tag --contains 警告: ${containsStderr}`);
+                            }
+                            const allTags = containsOutput.trim().split('\n').filter(tag => tag.trim().length > 0);
+                            console.log(`[Git服务] git tag --contains 找到 ${allTags.length} 个tag: ${allTags.join(', ')}`);
+                            if (allTags.length > 0) {
+                                // 取第一个tag（按版本号排序后最新的）
+                                versionTag = allTags[0].trim();
+                                console.log(`[Git服务] 通过 git tag --contains 提取到 tag 版本号: "${versionTag}"`);
+                            } else {
+                                console.log(`[Git服务] git tag --contains 未找到tag`);
+                            }
+                        } catch (containsError) {
+                            // git tag --contains 失败，继续尝试其他方法
+                            const errorMsg = containsError instanceof Error ? containsError.message : String(containsError);
+                            console.log(`[Git服务] git tag --contains 失败: ${errorMsg}`);
+                        }
+                        
+                        // 方法2: 如果 --contains 失败，尝试使用 git describe --exact-match 获取精确匹配的tag
+                        if (versionTag === '无' || versionTag.trim() === '') {
+                            try {
+                                console.log(`[Git服务] 尝试方法2: git describe --exact-match --tags ${commitHash}`);
+                                const { stdout: exactMatchOutput, stderr: exactMatchStderr } = await execPromise(
+                                    `git describe --exact-match --tags ${commitHash}`,
+                                    {
+                                        cwd: projectRoot,
+                                        maxBuffer: 1024 * 1024 // 1MB buffer
+                                    }
+                                );
+                                if (exactMatchStderr) {
+                                    console.log(`[Git服务] git describe --exact-match 警告: ${exactMatchStderr}`);
+                                }
+                                const exactTag = exactMatchOutput.trim();
+                                if (exactTag) {
+                                    versionTag = exactTag;
+                                    console.log(`[Git服务] 通过 git describe --exact-match 提取到 tag 版本号: "${versionTag}"`);
+                                } else {
+                                    console.log(`[Git服务] git describe --exact-match 未找到tag`);
+                                }
+                            } catch (exactError) {
+                                // 精确匹配失败，继续尝试其他方法
+                                const errorMsg = exactError instanceof Error ? exactError.message : String(exactError);
+                                console.log(`[Git服务] git describe --exact-match 失败: ${errorMsg}`);
+                            }
+                        }
+                        
+                        // 方法3: 如果上述方法都失败，尝试使用 git describe --tags 获取最近的tag
+                        // 这会返回最近的tag，即使当前提交不是tag本身
+                        if (versionTag === '无' || versionTag.trim() === '') {
+                            try {
+                                console.log(`[Git服务] 尝试方法3: git describe --tags ${commitHash}`);
+                                const { stdout: describeOutput, stderr: describeStderr } = await execPromise(
+                                    `git describe --tags ${commitHash}`,
+                                    {
+                                        cwd: projectRoot,
+                                        maxBuffer: 1024 * 1024 // 1MB buffer
+                                    }
+                                );
+                                if (describeStderr) {
+                                    console.log(`[Git服务] git describe --tags 警告: ${describeStderr}`);
+                                }
+                                const describedTag = describeOutput.trim();
+                                if (describedTag) {
+                                    // git describe 可能返回 "v1.0.0-5-gabc1234" 这样的格式
+                                    // 我们只取tag部分（第一个连字符之前的部分）
+                                    const tagMatch = describedTag.match(/^([^-]+)/);
+                                    if (tagMatch && tagMatch[1]) {
+                                        versionTag = tagMatch[1];
+                                        console.log(`[Git服务] 通过 git describe --tags 提取到 tag 版本号: "${versionTag}"`);
+                                    } else {
+                                        console.log(`[Git服务] git describe --tags 返回格式无法解析: "${describedTag}"`);
+                                    }
+                                } else {
+                                    console.log(`[Git服务] git describe --tags 未找到tag`);
+                                }
+                            } catch (describeError) {
+                                // git describe 失败，继续尝试其他方法
+                                const errorMsg = describeError instanceof Error ? describeError.message : String(describeError);
+                                console.log(`[Git服务] git describe --tags 失败: ${errorMsg}`);
+                            }
+                        }
+                        
+                        // 方法4: 如果git命令都失败，尝试从 %d 格式中提取tag（备用方法）
+                        if ((versionTag === '无' || versionTag.trim() === '') && versionLine) {
+                            console.log(`[Git服务] 尝试方法4: 从 %d 格式提取tag，原始版本信息: "${versionLine}"`);
                     // 移除首尾的括号和空格
                     const cleanedVersion = versionLine.replace(/^[\(\s]+|[\)\s]+$/g, '');
                     
-                    // 1. 优先查找 tag: 后面的内容
-                    const tagMatch = cleanedVersion.match(/tag:\s*([^,)]+)/);
-                    if (tagMatch) {
+                            // 优先查找 tag: 后面的内容（支持多个tag，取第一个）
+                            // 匹配格式：tag: v1.0.0 或 tag:v1.0.0
+                            const tagMatch = cleanedVersion.match(/tag:\s*([^,)]+)/i);
+                            if (tagMatch && tagMatch[1]) {
                         versionTag = tagMatch[1].trim();
-                        console.log(`[Git服务] 提取到 tag 版本号: "${versionTag}"`);
+                                console.log(`[Git服务] 从 %d 格式提取到 tag 版本号: "${versionTag}"`);
+                            } else {
+                                console.log(`[Git服务] %d 格式中未找到tag信息`);
+                            }
+                        }
+                    } catch (error) {
+                        // 所有tag查找方法都失败，忽略错误
+                        const errorMsg = error instanceof Error ? error.message : String(error);
+                        console.log(`[Git服务] 所有tag查找方法都失败: ${errorMsg}`);
                     }
+                    console.log(`[Git服务] 最终确定的版本号: "${versionTag}"`);
                 }
 
-                // 2. 如果没有 tag，优先使用提交哈希作为版本号（取前8位）
+                // 2. 如果没有 tag，才使用提交哈希作为版本号（取前8位）
                 if (versionTag === '无' || versionTag.trim() === '') {
                     if (commitHash) {
                         versionTag = commitHash.substring(0, 8);

@@ -82,11 +82,47 @@ export function activate(context: vscode.ExtensionContext) {
         }
     );
 
-    // 注册创建 LICENSE 文件命令
+    // 动态注册创建 LICENSE 文件命令（为每个模板文件注册一个命令）
+    const licenseTemplates = TemplateService.getLicenseTemplates();
+    const licenseDisposables: vscode.Disposable[] = [];
+    
+    console.log(`[版本号插件] 找到 ${licenseTemplates.length} 个 LICENSE 模板: ${licenseTemplates.join(', ')}`);
+    
+    for (const templateFile of licenseTemplates) {
+        // 为每个模板文件创建一个命令，命令ID格式：odinsamVsTools.createLicense.{文件名}
+        // 文件名中的特殊字符需要处理，使用安全的命令ID格式
+        const safeCommandId = templateFile.replace(/[^a-zA-Z0-9]/g, '_');
+        const commandId = `odinsamVsTools.createLicense.${safeCommandId}`;
+        
+        console.log(`[版本号插件] 注册 LICENSE 命令: ${commandId} (模板文件: ${templateFile})`);
+        
+        const disposable = vscode.commands.registerCommand(
+            commandId,
+            async (uri: vscode.Uri) => {
+                console.log(`[版本号插件] 创建 LICENSE 文件命令被触发 (模板: ${templateFile})`);
+                try {
+                    const targetDir = uri.fsPath;
+                    // 确保是目录
+                    const stat = fs.statSync(targetDir);
+                    if (!stat.isDirectory()) {
+                        UserInteractionService.showErrorMessage('请选择文件夹');
+                        return;
+                    }
+                    await TemplateService.createLicense(targetDir, templateFile);
+                } catch (error) {
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    UserInteractionService.showErrorMessage(errorMessage);
+                }
+            }
+        );
+        licenseDisposables.push(disposable);
+    }
+    
+    // 保留旧的命令ID以保持向后兼容（如果没有模板文件，使用默认行为）
     const createLicenseDisposable = vscode.commands.registerCommand(
         'odinsamVsTools.createLicense',
         async (uri: vscode.Uri) => {
-            console.log('[版本号插件] 创建 LICENSE 文件命令被触发');
+            console.log('[版本号插件] 创建 LICENSE 文件命令被触发（默认）');
             try {
                 const targetDir = uri.fsPath;
                 // 确保是目录
@@ -102,6 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
             }
         }
     );
+    licenseDisposables.push(createLicenseDisposable);
 
     // 注册创建 .versionconfig 文件命令
     const createVersionConfigDisposable = vscode.commands.registerCommand(
@@ -209,7 +246,7 @@ export function activate(context: vscode.ExtensionContext) {
         updateVersionDisposable,
         updateVersionFromFileDisposable,
         createGitignoreDisposable,
-        createLicenseDisposable,
+        ...licenseDisposables, // 包含所有license相关的命令
         createVersionConfigDisposable,
         createChangelogDisposable,
         updateChangelogDisposable
